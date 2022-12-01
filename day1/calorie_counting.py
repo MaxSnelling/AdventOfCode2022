@@ -1,17 +1,6 @@
 import numpy as np
 
 
-def sum_largest_elves(calorie_counts: list, n: int) -> int:
-    """ Sum largest values in list.
-
-    :param calorie_counts: list of calories each elf has
-    :param n: number of top elves to sum
-    :return: total calories held by top elves
-    """
-    np.sort(calorie_counts)
-    return np.sum(calorie_counts[-n:])
-
-
 def get_calories_per_elf(filename: str) -> list:
     """Sum calories held by each elf using input file
 
@@ -29,6 +18,17 @@ def get_calories_per_elf(filename: str) -> list:
                 calories_per_elf.append(elf_sum)
                 elf_sum = 0
         return calories_per_elf
+
+
+def sum_largest_elves(calorie_counts: list, n: int) -> int:
+    """ Sum largest values in list.
+
+    :param calorie_counts: list of calories each elf has
+    :param n: number of top elves to sum
+    :return: total calories held by top elves
+    """
+    np.sort(calorie_counts)
+    return np.sum(calorie_counts[-n:])
 
 
 if __name__ == '__main__':
