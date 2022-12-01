@@ -36,7 +36,7 @@ if __name__ == '__main__':
     calories_per_elf = get_calories_per_elf('input.txt')
     print(f"Largest: {np.max(calories_per_elf)}")
 
-    # Part Two
+    #  Part Two
     top_elves_count = 3
     if top_elves_count <= len(calories_per_elf):
         print(f"Sum of largest {top_elves_count} elves: {sum_largest_elves(calories_per_elf, top_elves_count)}")
