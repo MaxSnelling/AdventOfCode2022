@@ -18,62 +18,35 @@ def build_children(lines: list, i: int, folder: Folder):
             folder.sub_folders.update({child_folder_name: child_folder})
         elif lines[i].startswith("$ ls"):
             i += 1
-            pass
         elif lines[i].startswith("dir "):
             folder_name = lines[i][4:-1]
             if folder.sub_folders.get(folder_name) is None:
                 folder.sub_folders.update({folder_name: Folder(folder_name)})
             i += 1
-            pass
-        else:
+        else:  # File with size, in form "XXXXX name"
             folder.memory_size += int(lines[i].split(" ")[0])
             i += 1
 
 
-def investigate_children(folder: Folder, total_sum: int):
+def investigate_children(folder: Folder, sum_of_small_dirs: int):
     sum = folder.memory_size
 
-    if len(folder.sub_folders) == 0:
-        if sum <= 100000:
-            total_sum += sum
-        return folder, sum, total_sum
-
     for name in folder.sub_folders:
-        sub_folder2 = folder.sub_folders.get(name)
-        sub_folder, sub_sum, total_sum = investigate_children(sub_folder2, total_sum)
-        sum += sub_sum
+        sub_dir_sum, sum_of_small_dirs = investigate_children(folder.sub_folders.get(name), sum_of_small_dirs)
+        sum += sub_dir_sum
 
     if sum <= 100000:
-        total_sum += sum
+        sum_of_small_dirs += sum
 
-    return folder, sum, total_sum
-
-
-def get_sum(folder: Folder):
-    sum = 0
-
-    if len(folder.sub_folders) == 0:
-        return folder.memory_size
-
-    for name in folder.sub_folders:
-        sub_folder2 = folder.sub_folders.get(name)
-        sum += get_sum(sub_folder2)
-
-    return sum
+    return sum, sum_of_small_dirs
 
 
-def get_size(folder:Folder, min_del_size):
+def get_size(folder: Folder, min_del_size):
     sum = folder.memory_size
 
-    if len(folder.sub_folders) == 0:
-        if delete_size <= sum < min_del_size:
-            min_del_size = sum
-        return sum, min_del_size
-
     for name in folder.sub_folders:
-        sub_folder2 = folder.sub_folders.get(name)
-        sub_sum, min_del_size = get_size(sub_folder2, min_del_size)
-        sum += sub_sum
+        sub_dir_sum, min_del_size = get_size(folder.sub_folders.get(name), min_del_size)
+        sum += sub_dir_sum
 
     if delete_size <= sum < min_del_size:
         min_del_size = sum
@@ -83,13 +56,10 @@ def get_size(folder:Folder, min_del_size):
 
 with open('input.txt') as f:
     lines = f.readlines()
-    i = 1
-    root, i = build_children(lines, i, Folder("/"))
-    root, sum, total_sum = investigate_children(root, 0)
-    print(sum)
-    print(total_sum)
+    root, i = build_children(lines, 1, Folder("/"))
+    sum, sum_of_small_dirs = investigate_children(root, 0)
+    print(f"Sum of directories less than 100000: {sum_of_small_dirs}")
+
     delete_size = sum - 40000000
-    min_size = get_size(root, sum)
-    print(delete_size)
-    print(min_size)
-    print(f"sum: {sum}")
+    sum, min_del_size = get_size(root, sum)
+    print(f"Minimum folder size to remove {delete_size}: {min_del_size}")
